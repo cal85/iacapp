@@ -118,16 +118,15 @@
       "type": "secureObject",
       "defaultValue": {
         "secrets":  [
-            {            
-              "secretName": "exampleSecret1",
-              "secretValue": "secretVaule1"
-            },
-            {            
-              "secretName": "exampleSecret2",
-              "secretValue": "secretValue2"
-            }            
-          ]   
-        }
+          {            
+            "secretName": "exampleSecret1",
+            "secretValue": "secretVaule1"
+          },
+          {            
+            "secretName": "exampleSecret2",
+            "secretValue": "secretValue2"
+          }            
+        ]   
       },
       "metadata": {
         "description": "Specifies all secrets {\"secretName\":\"\",\"secretValue\":\"\"} wrapped in a secure object."
