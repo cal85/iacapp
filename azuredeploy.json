@@ -268,7 +268,7 @@
       ],
       "copy": {
         "name": "secretsCopy",
-        "count": "[length(parameters('secretsObject').secrets)]"
+        "count": "[if(equals(length(parameters('secretsObject').secrets), 0), 1, length(parameters('secretsObject').secrets))]"
       },
       "properties": {
         "value": "[parameters('secretsObject').secrets[copyIndex()].secretValue]"
