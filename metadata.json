@@ -1,0 +1,11 @@
+{
+  "$schema": "https://aka.ms/azure-quickstart-templates-metadata-schema#",
+  "type": "QuickStart",
+  "itemDisplayName": "Infrastructure As Code - Foundation",
+  "description": "Deployment IaC App w/ DB and additional required resources to get started",
+  "summary": "A blank template and empty parameters file.  Use this template as the framework for your custom deployment.",
+  "githubUsername": "cal85",
+  "dateUpdated": "2019-02-22"
+}
+
+
