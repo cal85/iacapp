@@ -157,12 +157,96 @@
       "metadata": {
         "description": "File Share Name"
       }
+    },
+    "privateIP": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "dnsIP": {
+        "type": "array",
+        "defaultValue": ["168.63.129.16"]
+    },
+    "networkInterfaceName": {
+        "type": "string"
+    },
+    "subnetName": {
+        "type": "string"
     }
   },    
   "variables": {
-    "iacOrchestratorId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('iacOrchestrator'))]"
+    "iacOrchestratorId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('iacOrchestrator'))]",
+    "vnetId": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
+    "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]"
   },
   "resources": [
+      {
+        "name": "[parameters('networkInterfaceName')]",
+        "type": "Microsoft.Network/networkInterfaces",
+        "apiVersion": "2016-09-01",
+        "location": "[resourceGroup().location]",
+        "condition":"[and(not(equals(parameters('privateIP'),'')),equals(parameters('dnsIP'),['168.63.129.16']))]",
+        "dependsOn": [],
+        "properties": {
+            "ipConfigurations": [
+                {
+                    "name": "ipconfig1",
+                    "properties": {
+                        "subnet": {
+                            "id": "[variables('subnetRef')]"
+                        },
+                        "privateIPAllocationMethod": "Static",
+                        "privateIPAddress": "[parameters('privateIP')]"
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "name": "[parameters('networkInterfaceName')]",
+        "type": "Microsoft.Network/networkInterfaces",
+        "apiVersion": "2016-09-01",
+        "location": "[resourceGroup().location]",
+        "condition":"[and(not(equals(parameters('privateIP'),'')),not(equals(parameters('dnsIP'),['168.63.129.16'])))]",
+        "dependsOn": [],
+        "properties": {
+            "ipConfigurations": [
+                {
+                    "name": "ipconfig1",
+                    "properties": {
+                        "subnet": {
+                            "id": "[variables('subnetRef')]"
+                        },
+                        "privateIPAllocationMethod": "Static",
+                        "privateIPAddress": "[parameters('privateIP')]"
+                    }
+                }
+            ],
+            "dnsSettings" :{
+                "dnsServers": "[parameters('dnsIP')]"
+            }
+        }
+    },
+    {
+        "name": "[parameters('networkInterfaceName')]",
+        "type": "Microsoft.Network/networkInterfaces",
+        "apiVersion": "2016-09-01",
+        "location": "[resourceGroup().location]",
+        "condition":"[and(equals(parameters('privateIP'),''),equals(parameters('dnsIP'),['168.63.129.16']))]",
+        "dependsOn": [],
+        "properties": {
+            "ipConfigurations": [
+                {
+                    "name": "ipconfig1",
+                    "properties": {
+                        "subnet": {
+                            "id": "[variables('subnetRef')]"
+                        },
+                        "privateIPAllocationMethod": "Dynamic"
+                    }
+                }
+            ]
+        }
+    },
     {
       "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
       "name": "[parameters('iacOrchestrator')]",
