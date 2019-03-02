@@ -185,7 +185,7 @@
         "type": "Microsoft.Network/networkInterfaces",
         "apiVersion": "2016-09-01",
         "location": "[resourceGroup().location]",
-        "condition":"[and(not(equals(parameters('privateIP'),'')),equals(parameters('dnsIP'),parameters('defaultDNS')))]",
+        "condition":"[and(not(equals(parameters('privateIP'),'')),equals(parameters('dnsIP'),variables('defaultDNS')))]",
         "dependsOn": [],
         "properties": {
             "ipConfigurations": [
@@ -207,7 +207,7 @@
         "type": "Microsoft.Network/networkInterfaces",
         "apiVersion": "2016-09-01",
         "location": "[resourceGroup().location]",
-        "condition":"[and(not(equals(parameters('privateIP'),'')),not(equals(parameters('dnsIP'),parameters('defaultDNS'))))]",
+        "condition":"[and(not(equals(parameters('privateIP'),'')),not(equals(parameters('dnsIP'),variables('defaultDNS'))))]",
         "dependsOn": [],
         "properties": {
             "ipConfigurations": [
@@ -232,7 +232,7 @@
         "type": "Microsoft.Network/networkInterfaces",
         "apiVersion": "2016-09-01",
         "location": "[resourceGroup().location]",
-        "condition":"[and(equals(parameters('privateIP'),''),equals(parameters('dnsIP'),parameters('defaultDNS')))]",
+        "condition":"[and(equals(parameters('privateIP'),''),equals(parameters('dnsIP'),variables('defaultDNS')))]",
         "dependsOn": [],
         "properties": {
             "ipConfigurations": [
@@ -253,7 +253,7 @@
       "type": "Microsoft.Network/networkInterfaces",
       "apiVersion": "2016-09-01",
       "location": "[resourceGroup().location]",
-      "condition":"[and(equals(parameters('privateIP'),''),not(equals(parameters('dnsIP'),parameters('defaultDNS'))))]",
+      "condition":"[and(equals(parameters('privateIP'),''),not(equals(parameters('dnsIP'),variables('defaultDNS'))))]",
       "dependsOn": [],
       "properties": {
           "ipConfigurations": [
