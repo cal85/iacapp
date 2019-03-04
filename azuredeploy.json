@@ -157,14 +157,6 @@
       "metadata": {
         "description": "File Share Name"
       }
-    },
-    "privateIP": {
-      "type": "string",
-      "defaultValue": ""
-    },
-    "dnsIP": {
-        "type": "array",
-        "defaultValue": ["168.63.129.16"]
     }
   },    
   "variables": {
@@ -277,16 +269,11 @@
               ],
               "vpnClientRevokedCertificates": [],
               "vpnClientIpsecPolicies": []
-          },
-          "bgpSettings": {
-              "asn": 65515,
-              "bgpPeeringAddress": "10.0.0.254",
-              "peerWeight": 0
           }
       },
       "dependsOn": [
           "[resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('vnetName'),'-pip'))]",
-          "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), 'GatewaySubnet')]"
+          "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
       ]
     },
     {
