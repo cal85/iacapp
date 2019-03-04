@@ -18,21 +18,21 @@
     },
     "vnetAddressPrefix": {
         "type": "string",
-        "defaultValue": "10.0.0.0/16",
+        "defaultValue": "10.0.0.0/8",
         "metadata": {
             "description": "Address prefix"
         }
     },
     "subnetAddressPrefixes": {
         "type": "array", 
-        "defaultValue": ["10.0.0.0/24"],
+        "defaultValue": ["10.0.0.0/24","10.1.0.0/24"],
         "metadata": {
             "description": "Subnet prefixes List, should have exactly same number of element as subnet names list. Otherwise, the virtual network won't be deployed"
         }
     },
     "subnetNames": {
         "type": "array",
-        "defaultValue": ["iac-subnet-001"],
+        "defaultValue": ["GatewaySubnet","iac-subnet-001"],
         "metadata": {
             "description": "Subnet names List, should have exactly same number of element as subnet prefixes list. Otherwise, the virtual network won't be deployed"
         }
@@ -165,116 +165,24 @@
     "dnsIP": {
         "type": "array",
         "defaultValue": ["168.63.129.16"]
-    },
-    "networkInterfaceName": {
-        "type": "string"
-    },
-    "subnetName": {
-        "type": "string"
     }
   },    
   "variables": {
-    "iacOrchestratorId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('iacOrchestrator'))]",
-    "vnetId": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
-    "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
-    "defaultDNS": ["168.63.129.16"]
+    "iacOrchestratorId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('iacOrchestrator'))]"
   },
   "resources": [
-      {
-        "name": "[parameters('networkInterfaceName')]",
-        "type": "Microsoft.Network/networkInterfaces",
-        "apiVersion": "2016-09-01",
-        "location": "[resourceGroup().location]",
-        "condition":"[and(not(equals(parameters('privateIP'),'')),equals(parameters('dnsIP'),variables('defaultDNS')))]",
-        "dependsOn": [],
-        "properties": {
-            "ipConfigurations": [
-                {
-                    "name": "ipconfig1",
-                    "properties": {
-                        "subnet": {
-                            "id": "[variables('subnetRef')]"
-                        },
-                        "privateIPAllocationMethod": "Static",
-                        "privateIPAddress": "[parameters('privateIP')]"
-                    }
-                }
-            ]
-        }
-    },
     {
-        "name": "[parameters('networkInterfaceName')]",
-        "type": "Microsoft.Network/networkInterfaces",
-        "apiVersion": "2016-09-01",
-        "location": "[resourceGroup().location]",
-        "condition":"[and(not(equals(parameters('privateIP'),'')),not(equals(parameters('dnsIP'),variables('defaultDNS'))))]",
-        "dependsOn": [],
-        "properties": {
-            "ipConfigurations": [
-                {
-                    "name": "ipconfig1",
-                    "properties": {
-                        "subnet": {
-                            "id": "[variables('subnetRef')]"
-                        },
-                        "privateIPAllocationMethod": "Static",
-                        "privateIPAddress": "[parameters('privateIP')]"
-                    }
-                }
-            ],
-            "dnsSettings" :{
-                "dnsServers": "[parameters('dnsIP')]"
-            }
-        }
-    },
-    {
-        "name": "[parameters('networkInterfaceName')]",
-        "type": "Microsoft.Network/networkInterfaces",
-        "apiVersion": "2016-09-01",
-        "location": "[resourceGroup().location]",
-        "condition":"[and(equals(parameters('privateIP'),''),equals(parameters('dnsIP'),variables('defaultDNS')))]",
-        "dependsOn": [],
-        "properties": {
-            "ipConfigurations": [
-                {
-                    "name": "ipconfig1",
-                    "properties": {
-                        "subnet": {
-                            "id": "[variables('subnetRef')]"
-                        },
-                        "privateIPAllocationMethod": "Dynamic"
-                    }
-                }
-            ]
-        }
-    },
-    {
-      "name": "[parameters('networkInterfaceName')]",
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "2016-09-01",
-      "location": "[resourceGroup().location]",
-      "condition":"[and(equals(parameters('privateIP'),''),not(equals(parameters('dnsIP'),variables('defaultDNS'))))]",
-      "dependsOn": [],
-      "properties": {
-          "ipConfigurations": [
-              {
-                  "name": "ipconfig1",
-                  "properties": {
-                      "subnet": {
-                          "id": "[variables('subnetRef')]"
-                      },
-                      "privateIPAllocationMethod": "Dynamic"
-                  }
-              }
-          ],
-          "dnsSettings" :{
-              "dnsServers": "[parameters('dnsIP')]"
-          }
-      }
-  },
-  {
       "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
       "name": "[parameters('iacOrchestrator')]",
+      "apiVersion": "2018-11-30",
+      "location": "[resourceGroup().location]",
+      "tags": {},
+      "scale": null,
+      "dependsOn": []
+    },
+    {
+      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "name": "iacVMAgent",
       "apiVersion": "2018-11-30",
       "location": "[resourceGroup().location]",
       "tags": {},
@@ -303,6 +211,83 @@
       "sku": { "name": "[parameters('storageAccountType')]" },
       "kind": "StorageV2",
       "properties": {}
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "sku": {
+          "name": "Basic",
+          "tier": "Regional"
+      },
+      "name": "[concat(parameters('vnetName'),'-pip')]",
+      "apiVersion": "2018-10-01",
+      "location": "southeastasia",
+      "scale": null,
+      "properties": {
+          "publicIPAddressVersion": "IPv4",
+          "publicIPAllocationMethod": "Dynamic",
+      },
+      "dependsOn": []
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworkGateways",
+      "name": "[concat(parameters('vnetName'),'-vgw')]",
+      "apiVersion": "2018-10-01",
+      "location": "southeastasia",
+      "scale": null,
+      "properties": {
+          "ipConfigurations": [
+              {
+                  "name": "default",
+                  "properties": {
+                      "privateIPAllocationMethod": "Dynamic",
+                      "publicIPAddress": {
+                          "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('vnetName'),'-pip'))]"
+                      },
+                      "subnet": {
+                          "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), 'GatewaySubnet')]"
+                      }
+                  }
+              }
+          ],
+          "sku": {
+              "name": "Basic",
+              "tier": "Basic",
+              "capacity": 2
+          },
+          "gatewayType": "Vpn",
+          "vpnType": "RouteBased",
+          "enableBgp": false,
+          "activeActive": false,
+          "vpnClientConfiguration": {
+              "vpnClientAddressPool": {
+                  "addressPrefixes": [
+                      "192.168.113.0/24"
+                  ]
+              },
+              "vpnClientProtocols": [
+                  "SSTP"
+              ],
+              "vpnClientRootCertificates": [
+                  {
+                      "name": "IaC",
+                      "properties": {
+                          "publicCertData": "MIIDIzCCAg+gAwIBAgIQDyQQgy/o4bhN4EcWYq5Y3zAJBgUrDgMCHQUAMCQxIjAgBgNVBAMTGVJvb3RDZXJ0aWZpY2F0ZURDU29uQXp1cmUwHhcNMTcwMTEwMDY0MzU1WhcNMzkxMjMxMjM1OTU5WjAkMSIwIAYDVQQDExlSb290Q2VydGlmaWNhdGVEQ1NvbkF6dXJlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0mxGG/1h7xWrjmNLoznBgPpbzAMlcPUhc4bPsYxhE2G9F1QY1gf+3qWAE3NjOhxCXtHgc30mdTrm9naWpNblXVryI+tlWozerCuK4dfLiKeqIPePTjjZ53LM2XNOQX/JJfKINGdxKoJ8jLq7BuunKWQDBuk9JcA2GN+424LVhCWLLWlAF1JdK5MbuG04Oj9BBSRP5G4YYfBVAk6I0e+TX8jttvoWeG3DFpyALxDfwZlGmbGMVfoBRw84gBQ99J8GcnS6QZYsXu/x/qZ0lBvx2g6jG/suYpRN2IZQG+tdr7bCyvVvdfIsWtQTvy7xf17yfmv6YKBw2enJiOEvaDQamwIDAQABo1kwVzBVBgNVHQEETjBMgBDdkTNrh2cniAdngmmdSZuNoSYwJDEiMCAGA1UEAxMZUm9vdENlcnRpZmljYXRlRENTb25BenVyZYIQDyQQgy/o4bhN4EcWYq5Y3zAJBgUrDgMCHQUAA4IBAQAj2XpDNr6wCD5/4a0ACiLNYZnZH8RQTywEeZqcDsntfgX5JT9H2KozWdyKaOj9+BcMPn86UXITreeBLgU2lsaZcTRyKs1WrytJ81fdmhkrwbi4+ggYFxaBSXmwXk8lA47SmogE606EoSdoDVKl4Oklrb2zzP8TAU8Unc3W7CX/77NvTwnJMK+krqcc+VuTAG6+nOmzHlh8S23Iz2t2d9sACPxkQG/mFjIVVwwVSbxOj6wxB5M6Q0wR23NxhHClF3J9AKgM8rwGEYLoJCB2oy36J6FFDF2MvlPdCo8eMQvGikJdBVi9M+hxG1i34vO71LSkftdKlxvVsf6w0lccgUBD"
+                      }
+                  }
+              ],
+              "vpnClientRevokedCertificates": [],
+              "vpnClientIpsecPolicies": []
+          },
+          "bgpSettings": {
+              "asn": 65515,
+              "bgpPeeringAddress": "10.0.0.254",
+              "peerWeight": 0
+          }
+      },
+      "dependsOn": [
+          "[resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('vnetName'),'-pip'))]",
+          "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), 'GatewaySubnet')]"
+      ]
     },
     {
       "name": "[parameters('vnetName')]",
