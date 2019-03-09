@@ -25,17 +25,38 @@
     },
     "subnetAddressPrefixes": {
         "type": "array", 
-        "defaultValue": ["10.0.0.0/24","10.1.0.0/24"],
+        "defaultValue": ["10.0.0.0/24"],
         "metadata": {
             "description": "Subnet prefixes List, should have exactly same number of element as subnet names list. Otherwise, the virtual network won't be deployed"
         }
     },
     "subnetNames": {
         "type": "array",
-        "defaultValue": ["GatewaySubnet","iac-subnet-001"],
+        "defaultValue": ["iac-subnet-001"],
         "metadata": {
             "description": "Subnet names List, should have exactly same number of element as subnet prefixes list. Otherwise, the virtual network won't be deployed"
         }
+    },
+    "GatewaySubnetName": {
+      "type": "string",
+      "defaultValue": "GatewaySubnet",
+      "metadata": {
+        "description": "Gateway subnet Name for the virtual network gateway"
+      }
+    },
+    "GatewaySubnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.1.0.0/24",
+      "metadata": {
+        "description": "Gateway subnet prefix for the virtual network gateway"
+      }
+    },
+    "vgwCertPubKey": {
+      "type": "string",
+      "defaultValue": "MIIDIzCCAg+gAwIBAgIQDyQQgy/o4bhN4EcWYq5Y3zAJBgUrDgMCHQUAMCQxIjAgBgNVBAMTGVJvb3RDZXJ0aWZpY2F0ZURDU29uQXp1cmUwHhcNMTcwMTEwMDY0MzU1WhcNMzkxMjMxMjM1OTU5WjAkMSIwIAYDVQQDExlSb290Q2VydGlmaWNhdGVEQ1NvbkF6dXJlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0mxGG/1h7xWrjmNLoznBgPpbzAMlcPUhc4bPsYxhE2G9F1QY1gf+3qWAE3NjOhxCXtHgc30mdTrm9naWpNblXVryI+tlWozerCuK4dfLiKeqIPePTjjZ53LM2XNOQX/JJfKINGdxKoJ8jLq7BuunKWQDBuk9JcA2GN+424LVhCWLLWlAF1JdK5MbuG04Oj9BBSRP5G4YYfBVAk6I0e+TX8jttvoWeG3DFpyALxDfwZlGmbGMVfoBRw84gBQ99J8GcnS6QZYsXu/x/qZ0lBvx2g6jG/suYpRN2IZQG+tdr7bCyvVvdfIsWtQTvy7xf17yfmv6YKBw2enJiOEvaDQamwIDAQABo1kwVzBVBgNVHQEETjBMgBDdkTNrh2cniAdngmmdSZuNoSYwJDEiMCAGA1UEAxMZUm9vdENlcnRpZmljYXRlRENTb25BenVyZYIQDyQQgy/o4bhN4EcWYq5Y3zAJBgUrDgMCHQUAA4IBAQAj2XpDNr6wCD5/4a0ACiLNYZnZH8RQTywEeZqcDsntfgX5JT9H2KozWdyKaOj9+BcMPn86UXITreeBLgU2lsaZcTRyKs1WrytJ81fdmhkrwbi4+ggYFxaBSXmwXk8lA47SmogE606EoSdoDVKl4Oklrb2zzP8TAU8Unc3W7CX/77NvTwnJMK+krqcc+VuTAG6+nOmzHlh8S23Iz2t2d9sACPxkQG/mFjIVVwwVSbxOj6wxB5M6Q0wR23NxhHClF3J9AKgM8rwGEYLoJCB2oy36J6FFDF2MvlPdCo8eMQvGikJdBVi9M+hxG1i34vO71LSkftdKlxvVsf6w0lccgUBD",
+      "metadata": {
+        "description": "Virtual Network Gateway P2S VPN certificate public key"
+      }
     },
     "keyVaultName": {
         "type": "string",
@@ -263,7 +284,7 @@
                   {
                       "name": "IaC",
                       "properties": {
-                          "publicCertData": "MIIDIzCCAg+gAwIBAgIQDyQQgy/o4bhN4EcWYq5Y3zAJBgUrDgMCHQUAMCQxIjAgBgNVBAMTGVJvb3RDZXJ0aWZpY2F0ZURDU29uQXp1cmUwHhcNMTcwMTEwMDY0MzU1WhcNMzkxMjMxMjM1OTU5WjAkMSIwIAYDVQQDExlSb290Q2VydGlmaWNhdGVEQ1NvbkF6dXJlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0mxGG/1h7xWrjmNLoznBgPpbzAMlcPUhc4bPsYxhE2G9F1QY1gf+3qWAE3NjOhxCXtHgc30mdTrm9naWpNblXVryI+tlWozerCuK4dfLiKeqIPePTjjZ53LM2XNOQX/JJfKINGdxKoJ8jLq7BuunKWQDBuk9JcA2GN+424LVhCWLLWlAF1JdK5MbuG04Oj9BBSRP5G4YYfBVAk6I0e+TX8jttvoWeG3DFpyALxDfwZlGmbGMVfoBRw84gBQ99J8GcnS6QZYsXu/x/qZ0lBvx2g6jG/suYpRN2IZQG+tdr7bCyvVvdfIsWtQTvy7xf17yfmv6YKBw2enJiOEvaDQamwIDAQABo1kwVzBVBgNVHQEETjBMgBDdkTNrh2cniAdngmmdSZuNoSYwJDEiMCAGA1UEAxMZUm9vdENlcnRpZmljYXRlRENTb25BenVyZYIQDyQQgy/o4bhN4EcWYq5Y3zAJBgUrDgMCHQUAA4IBAQAj2XpDNr6wCD5/4a0ACiLNYZnZH8RQTywEeZqcDsntfgX5JT9H2KozWdyKaOj9+BcMPn86UXITreeBLgU2lsaZcTRyKs1WrytJ81fdmhkrwbi4+ggYFxaBSXmwXk8lA47SmogE606EoSdoDVKl4Oklrb2zzP8TAU8Unc3W7CX/77NvTwnJMK+krqcc+VuTAG6+nOmzHlh8S23Iz2t2d9sACPxkQG/mFjIVVwwVSbxOj6wxB5M6Q0wR23NxhHClF3J9AKgM8rwGEYLoJCB2oy36J6FFDF2MvlPdCo8eMQvGikJdBVi9M+hxG1i34vO71LSkftdKlxvVsf6w0lccgUBD"
+                          "publicCertData": "[parameters('vgwCertPubKey')]"
                       }
                   }
               ],
@@ -303,6 +324,18 @@
           }
         ]
       }
+    },
+    {
+      "apiVersion": "2018-04-01",
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "name": "[parameters('GatewaySubnetName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "addressPrefix": "[parameters('GatewaySubnetPrefix')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
+      ]
     },
     {
       "type": "Microsoft.KeyVault/vaults",
@@ -354,6 +387,22 @@
       "properties": {
         "value": "[parameters('secretsObject').secrets[copyIndex()].secretValue]"
       }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(parameters('keyVaultName'), '/vnetName')]",
+      "apiVersion": "2018-02-14",
+      "location": "[resourceGroup().location]",
+      "dependsOn": ["[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"],
+      "properties": { "value": "parameters('vnetName')"}
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(parameters('keyVaultName'), '/fileShareName')]",
+      "apiVersion": "2018-02-14",
+      "location": "[resourceGroup().location]",
+      "dependsOn": ["[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"],
+      "properties": { "value": "parameters('fileShareName')"}
     }
   ],
   "outputs": {}
