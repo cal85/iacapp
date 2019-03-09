@@ -113,7 +113,8 @@
     "secretsPermissions": {
       "type": "array",
       "defaultValue": [
-        "list"
+        "list",
+        "get"
       ],
       "metadata": {
         "description": "Specifies the permissions to secrets in the vault. Valid values are: all, get, list, set, delete, backup, restore, recover, and purge."
@@ -170,6 +171,13 @@
       "defaultValue": "iac-fs-001",
       "metadata": {
         "description": "File Share Name"
+      }
+    },
+    "vmAdminPw": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Local Administrator password for provisionned VM"
       }
     }
   },    
@@ -405,7 +413,15 @@
       "location": "[resourceGroup().location]",
       "dependsOn": ["[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"],
       "properties": { "value": "[parameters('storageAccountName')]"}
-    }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(parameters('keyVaultName'), '/vmAdminPw')]",
+      "apiVersion": "2018-02-14",
+      "location": "[resourceGroup().location]",
+      "dependsOn": ["[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"],
+      "properties": { "value": "[parameters('vmAdminPw')]"}
+    }    
   ],
   "outputs": {}
 }
