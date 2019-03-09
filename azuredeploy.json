@@ -37,13 +37,6 @@
             "description": "Subnet names List, should have exactly same number of element as subnet prefixes list. Otherwise, the virtual network won't be deployed"
         }
     },
-    "GatewaySubnetName": {
-      "type": "string",
-      "defaultValue": "GatewaySubnet",
-      "metadata": {
-        "description": "Gateway subnet Name for the virtual network gateway"
-      }
-    },
     "GatewaySubnetPrefix": {
       "type": "string",
       "defaultValue": "10.1.0.0/24",
@@ -294,7 +287,8 @@
       },
       "dependsOn": [
           "[resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('vnetName'),'-pip'))]",
-          "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
+          "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
+          "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), 'GatewaySubnet')]"
       ]
     },
     {
@@ -328,7 +322,7 @@
     {
       "apiVersion": "2018-04-01",
       "type": "Microsoft.Network/virtualNetworks/subnets",
-      "name": "[parameters('GatewaySubnetName')]",
+      "name": "[concat(parameters('vnetName'), '/GatewaySubnet')]",
       "location": "[resourceGroup().location]",
       "properties": {
         "addressPrefix": "[parameters('GatewaySubnetPrefix')]"
