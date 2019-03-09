@@ -388,7 +388,7 @@
       "apiVersion": "2018-02-14",
       "location": "[resourceGroup().location]",
       "dependsOn": ["[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"],
-      "properties": { "value": "parameters('vnetName')"}
+      "properties": { "value": "[parameters('vnetName')]"}
     },
     {
       "type": "Microsoft.KeyVault/vaults/secrets",
@@ -396,7 +396,15 @@
       "apiVersion": "2018-02-14",
       "location": "[resourceGroup().location]",
       "dependsOn": ["[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"],
-      "properties": { "value": "parameters('fileShareName')"}
+      "properties": { "value": "[parameters('fileShareName')]"}
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(parameters('keyVaultName'), '/storageAccountName')]",
+      "apiVersion": "2018-02-14",
+      "location": "[resourceGroup().location]",
+      "dependsOn": ["[concat('Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"],
+      "properties": { "value": "[parameters('storageAccountName')]"}
     }
   ],
   "outputs": {}
